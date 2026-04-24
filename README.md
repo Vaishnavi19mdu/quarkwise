@@ -148,9 +148,9 @@ Quarkwise is an intelligent energy analysis platform that helps households under
 
 ---
 
-## 👥 Team
+## 👥 Built by 
 
-- Your Name(s)
+- Vaishnavi N
 
 ---
 
