@@ -1,20 +1,159 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ⚛️ Quarkwise — Smart Household Energy Benchmarking
 
-# Run and deploy your AI Studio app
+Quarkwise is an intelligent energy analysis platform that helps households understand, compare, and reduce their electricity usage through data-driven insights, simulation, and AI assistance.
 
-This contains everything you need to run your app locally.
+> Turn your energy bill into actionable wisdom.
 
-View your app in AI Studio: https://ai.studio/apps/a7aae11a-33ce-420d-be09-7200b17edda2
+---
 
-## Run Locally
+## 🚀 Features
 
-**Prerequisites:**  Node.js
+### 📊 Energy Insights
+- Energy Score (0–100 efficiency rating)
+- Consumption Breakdown (Cooling, Appliances, Lighting)
+- Explain My Bill (clear reasoning for high usage)
 
+### 🏘️ Community Benchmarking
+- Compare with similar households using pincode
+- Efficiency ranking (e.g., Top 45%)
+- Improvement suggestions
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### ⚡ Predictive Simulator
+- Adjust AC usage and appliance efficiency
+- Instantly view:
+  - Predicted usage (kWh)
+  - Monthly bill
+  - Savings / extra cost
+  - Score change
+
+### 🌦️ Seasonal Forecast
+- Predict usage spikes (e.g., summer cooling demand)
+- Monthly trend insights
+- Future cost estimation
+
+### 🤖 AI + Voice Assistant
+- Ask:
+  - "Why is my bill high?"
+  - "How can I save more?"
+- Get real-time, personalized insights
+
+### 🎯 Gamified Goals
+- Set savings targets
+- Track progress
+- Improve efficiency ranking
+
+### 📄 Reports
+- Downloadable PDF summary of usage, insights, and tips
+
+---
+
+## 🧠 How It Works
+
+1. User inputs:
+   - Monthly usage / bill
+   - Pincode
+   - Appliance habits
+
+2. System processes:
+   - Normalizes usage data
+   - Compares with similar households
+   - Calculates efficiency score
+   - Generates insights & recommendations
+
+3. Output:
+   - Dashboard with analytics
+   - Predictions & savings simulation
+   - Personalized tips
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+- Next.js
+- React
+- Material UI
+
+### Backend
+- PocketBase (database, auth, API)
+
+### Data & Visualization
+- Recharts (charts)
+- Custom simulation logic (JavaScript)
+
+### AI / Logic
+- Rule-based recommendation engine
+- Context-aware assistant responses
+
+---
+
+## 📂 Project Structure
+
+```
+/src
+  /components
+    /dashboard
+    /simulator
+    /insights
+    /ui
+  /pages
+    dashboard
+    simulator
+    insights
+    reports
+    settings
+  /lib
+    logic
+    utils
+```
+
+---
+
+## ⚙️ Core Logic Highlights
+
+- Dynamic Energy Score calculation (based on usage vs baseline)
+- Real-time simulator updates (usage → bill → savings → score)
+- Context-aware recommendations (based on dominant usage)
+- Percentile-based community comparison
+
+---
+
+## 🔐 Backend (PocketBase)
+
+- Stores:
+  - User data
+  - Household configurations
+  - Usage inputs
+- Handles:
+  - Authentication
+  - Data persistence
+  - API endpoints for dashboard
+
+---
+
+## 🌍 Impact
+
+- Helps users reduce electricity bills
+- Encourages energy-efficient habits
+- Enables data-driven household decisions
+
+---
+
+## 🔮 Future Scope
+
+- Smart meter integration
+- Real-time usage tracking
+- Utility company partnerships
+- Mobile app support
+
+---
+
+## 👥 Team
+
+- Your Name(s)
+
+---
+
+## 📌 License
+
+This project was built for a hackathon and is for demonstration purposes.
