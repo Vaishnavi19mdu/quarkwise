@@ -12,6 +12,10 @@ import { InputPage } from './components/input/InputPage';
 import { EnergyProvider } from './context/EnergyContext';
 import { AuthProvider } from './lib/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { ReportsPage } from './components/dashboard/ReportsPage';
+
+// inside <Routes>
+
 
 const SettingsPage = lazy(() =>
   import('./components/dashboard/SettingsPage').then(m => ({ default: m.SettingsPage }))
@@ -43,6 +47,7 @@ export default function App() {
                   <Route path="/input"     element={<ProtectedRoute><InputPage /></ProtectedRoute>} />
                   <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                   <Route path="/settings"  element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                  <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
                 </Routes>
               </Suspense>
             </Layout>

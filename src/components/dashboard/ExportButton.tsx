@@ -376,7 +376,7 @@ export const ExportButton = ({ simulation }: { simulation?: any }) => {
             <FileText size={18} className="text-secondary" />
           </ListItemIcon>
           <ListItemText>
-            <Typography className="font-bold text-slate-700">Download PDF</Typography>
+            <Typography className="font-bold text-slate-700">Download HTML</Typography>
           </ListItemText>
         </MenuItem>
         <MenuItem onClick={handleExportCSV} className="py-3 px-4 hover:bg-slate-50 min-w-[180px]">

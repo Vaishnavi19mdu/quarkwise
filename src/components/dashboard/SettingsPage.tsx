@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useEnergy } from '../../context/EnergyContext';
 import { Sidebar } from './Sidebar';
+import { pb } from '../../lib/pocketbase';
 
 type Tab = 'profile' | 'energy' | 'app' | 'notifications';
 
@@ -57,10 +58,15 @@ export const SettingsPage = () => {
   const navigate = useNavigate();
   const { data, setEnergyData } = useEnergy();
 
+  // ── Pull real user from PocketBase auth store ──
+  const pbUser = pb.authStore.model;
+  const realName  = pbUser?.name  || pbUser?.username || '';
+  const realEmail = pbUser?.email || '';
+
   const [tab, setTab] = useState<Tab>('profile');
 
-  const [name, setName]       = useState('Household User');
-  const [email, setEmail]     = useState('user@example.com');
+  const [name, setName]       = useState(realName);
+  const [email, setEmail]     = useState(realEmail);
   const [pincode, setPincode] = useState(data.pincode);
 
   const [savingGoal, setSavingGoal] = useState(data.savingGoal ?? 10);
@@ -84,6 +90,9 @@ export const SettingsPage = () => {
   };
 
   const activeColor = TABS.find(t => t.id === tab)?.color ?? '#2F6F73';
+
+  // Avatar initial — first char of name, fallback to email, fallback to '?'
+  const avatarInitial = (name || realEmail || '?')[0].toUpperCase();
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -141,20 +150,42 @@ export const SettingsPage = () => {
                         className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-black shrink-0"
                         style={{ backgroundColor: '#6366f1' }}
                       >
-                        {name.charAt(0).toUpperCase()}
+                        {avatarInitial}
                       </div>
-                      <div>
-                        <Typography variant="body2" className="font-black text-slate-800">{name}</Typography>
-                        <Typography variant="caption" className="text-slate-400">{email}</Typography>
+                      <div className="min-w-0">
+                        <Typography variant="body2" className="font-black text-slate-800 truncate">
+                          {name || '—'}
+                        </Typography>
+                        <Typography variant="caption" className="text-slate-400 truncate block">
+                          {email || '—'}
+                        </Typography>
                       </div>
-                      <div className="ml-auto flex items-center gap-1.5">
+                      <div className="ml-auto flex items-center gap-1.5 shrink-0">
                         <div className="w-2 h-2 rounded-full bg-emerald-400" />
                         <Typography variant="caption" className="text-emerald-600 font-bold">Active</Typography>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <TextField label="Display name" value={name} onChange={e => setName(e.target.value)} size="small" fullWidth />
-                      <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} size="small" fullWidth type="email" />
+                      <TextField
+                        label="Display name"
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                        size="small"
+                        fullWidth
+                        placeholder={realName || 'Your name'}
+                      />
+                      <TextField
+                        label="Email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        size="small"
+                        fullWidth
+                        type="email"
+                        placeholder={realEmail}
+                        // email is read-only — PocketBase requires re-verification to change it
+                        slotProps={{ htmlInput: { readOnly: true } }}
+                        helperText="Managed by your account"
+                      />
                       <TextField
                         label="Pincode"
                         value={pincode}
@@ -173,7 +204,10 @@ export const SettingsPage = () => {
                   <div className="px-6 py-2">
                     <Row label="Sign out" sub="Returns you to the sign-in screen" last>
                       <button
-                        onClick={() => navigate('/signin')}
+                        onClick={() => {
+                          pb.authStore.clear();
+                          navigate('/signin');
+                        }}
                         className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 transition-all"
                       >
                         <LogOut size={13} /> Logout
@@ -327,7 +361,7 @@ export const SettingsPage = () => {
                   <div className="px-6 py-4 flex items-start gap-3 bg-pink-50/60">
                     <Bell size={16} className="text-pink-400 shrink-0 mt-0.5" />
                     <Typography variant="caption" className="text-slate-500 leading-relaxed">
-                      Notifications are simulated in this build. In a production deployment, alerts would be sent to your registered email address.
+                      Alerts would be sent to <strong>{email || 'your registered email'}</strong>.
                     </Typography>
                   </div>
                 </Card>

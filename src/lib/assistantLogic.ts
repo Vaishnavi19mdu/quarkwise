@@ -46,36 +46,99 @@ Be friendly and specific to their actual data.`;
   }
 }
 
-// Graceful fallback if API is unreachable
-function fallbackResponse(message: string, data: any): string {
-  const lower = message.toLowerCase();
-  const sim = data?.simulation;
+// ─── Fallback responses (used when API is unreachable) ────────────────────────
 
-  if (lower.includes('bill') || lower.includes('cost')) {
+function fallbackResponse(message: string, data: any): string {
+  const lower = message.toLowerCase().trim();
+  const sim = data?.simulation;
+  const ctx = data?.context;
+
+  // ── Greetings ──
+  if (/^(hi|hello|hey|howdy|sup|what'?s up|yo)\b/.test(lower)) {
+    return "Hey! I'm your energy assistant. Ask me about your bill, usage, savings, or tips to cut costs.";
+  }
+
+  // ── How are you / feelings ──
+  if (/how are you|how('?re| are) (you|things)|you good|you okay/.test(lower)) {
+    return "I'm doing great, thanks for asking! Ready to help you save on your energy bill.";
+  }
+
+  // ── What can you do / help ──
+  if (/what can you (do|help)|what do you (do|know)|help me|what are you/.test(lower)) {
+    return "I can answer questions about your predicted bill, energy score, usage vs the community average, and tips to cut your electricity costs. Just ask!";
+  }
+
+  // ── Thanks ──
+  if (/^(thanks|thank you|thx|ty|cheers|great|awesome|nice|cool|perfect)\b/.test(lower)) {
+    return "Happy to help! Let me know if you have any more questions about your energy usage.";
+  }
+
+  // ── Bye / goodbye ──
+  if (/^(bye|goodbye|see you|later|cya|take care)\b/.test(lower)) {
+    return "See you! Keep an eye on your usage and stay energy efficient!";
+  }
+
+  // ── Who are you ──
+  if (/who are you|what are you|are you (a bot|ai|robot|human)/.test(lower)) {
+    return "I'm Quarkwise's energy assistant, an AI built to help you understand and reduce your electricity usage.";
+  }
+
+  // ── Bill / cost ──
+  if (/bill|cost|pay|rupee|amount/.test(lower)) {
     return sim?.predictedBill
       ? `Your predicted bill is ${sim.predictedBill} rupees based on your current usage of ${sim.predictedUsage} kilowatt hours.`
       : "I couldn't retrieve your bill data right now. Try refreshing the page.";
   }
-  if (lower.includes('save') || lower.includes('saving')) {
+
+  // ── Savings ──
+  if (/save|saving|reduc|cut/.test(lower)) {
     return sim?.savings != null
       ? sim.savings >= 0
         ? `You could save ${sim.savings} rupees compared to your baseline. Try reducing AC usage for bigger savings.`
         : `Your current settings cost ${Math.abs(sim.savings)} rupees more than baseline. Switch appliances to Eco mode to reduce costs.`
       : "Check the Savings Simulator on your dashboard to explore ways to cut your bill.";
   }
-  if (lower.includes('score')) {
+
+  // ── Score ──
+  if (/score|rating|efficien/.test(lower)) {
     return sim?.predictedScore
-      ? `Your efficiency score is ${sim.predictedScore}. Scores above 70 are considered good.`
+      ? `Your efficiency score is ${sim.predictedScore} out of 100. Scores above 70 are considered good — keep reducing AC hours to improve it.`
       : "Your score reflects your overall energy efficiency compared to similar households.";
   }
-  if (lower.includes('average') || lower.includes('above') || lower.includes('below')) {
-    return sim?.predictedUsage && data?.context?.avgUsage
-      ? sim.predictedUsage > data.context.avgUsage
-        ? `You're using ${sim.predictedUsage} kilowatt hours versus the average of ${data.context.avgUsage}. You're above average.`
-        : `Great news — you're using less than the community average of ${data.context.avgUsage} kilowatt hours.`
-      : "Your usage is compared to similar households in your community benchmark section.";
+
+  // ── Usage / consumption ──
+  if (/usage|using|consum|kwh|unit/.test(lower)) {
+    return sim?.predictedUsage
+      ? `Your predicted usage this month is ${sim.predictedUsage} kilowatt hours. Your baseline was ${sim.baseUsage} kilowatt hours.`
+      : "Your usage data is shown on the dashboard. Try the simulator to see how changes affect your consumption.";
   }
-  return "I'm having trouble connecting right now. Please check your internet and try again in a moment.";
+
+  // ── Average / community ──
+  if (/average|above|below|community|neighbour|compare/.test(lower)) {
+    return sim?.predictedUsage && ctx?.avgUsage
+      ? sim.predictedUsage > ctx.avgUsage
+        ? `You're using ${sim.predictedUsage} kilowatt hours versus the community average of ${ctx.avgUsage}. You're above average — the simulator can help you close that gap.`
+        : `You're doing well! Your usage of ${sim.predictedUsage} kilowatt hours is below the community average of ${ctx.avgUsage}.`
+      : "Your usage is compared to similar households in the community benchmark section on the dashboard.";
+  }
+
+  // ── AC / appliances ──
+  if (/ac|air con|appliance|fan|fridge|tv|washing/.test(lower)) {
+    return `AC is usually the biggest energy consumer. Reducing daily AC hours even by one or two can noticeably lower your bill. Check the simulator to see the impact.`;
+  }
+
+  // ── Tips ──
+  if (/tip|advice|suggest|recommend|improve|better/.test(lower)) {
+    return "Top tips: reduce AC runtime during peak hours, switch to 5-star rated appliances, and unplug devices on standby. These can cut usage by up to 20 percent.";
+  }
+
+  // ── Dashboard / navigation ──
+  if (/dashboard|report|insight|simulator|chart|graph/.test(lower)) {
+    return "You can explore the Simulator to model savings, the Reports page for a full breakdown, and the Insights section for personalised recommendations — all in the sidebar.";
+  }
+
+  // ── Default ──
+  return "I'm not sure about that one, but I can help with your bill, energy score, usage comparisons, or saving tips. What would you like to know?";
 }
 
 // ─── Voice Input (Speech Recognition) ────────────────────────────────────────
@@ -160,7 +223,6 @@ export function speakResponse(
 
   cancelSpeech();
 
-  // Strip markdown/symbols that sound bad when spoken
   const cleaned = text
     .replace(/[*_`#]/g, '')
     .replace(/₹/g, 'rupees ')
@@ -168,8 +230,6 @@ export function speakResponse(
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Edge/Chrome bug: long utterances cut off silently after ~15 seconds.
-  // Fix: split into sentences and chain them.
   const sentences = cleaned.match(/[^.!?]+[.!?]*/g)?.map(s => s.trim()).filter(Boolean) ?? [cleaned];
 
   let index = 0;
@@ -187,7 +247,6 @@ export function speakResponse(
     utt.volume = 1.0;
     currentUtterance = utt;
 
-    // Pick a natural-sounding voice if available
     const voices = window.speechSynthesis.getVoices();
     const preferred = voices.find(v =>
       v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online'))
@@ -200,7 +259,6 @@ export function speakResponse(
     };
 
     utt.onerror = (e) => {
-      // 'interrupted' is normal when cancelled — don't treat as failure
       if ((e as any).error !== 'interrupted') {
         console.warn('TTS error on sentence', index, (e as any).error);
       }
@@ -208,8 +266,6 @@ export function speakResponse(
       onDone?.();
     };
 
-    // Edge/Chrome heartbeat fix: the speech engine can silently pause.
-    // Resuming every 10s keeps it alive.
     if (ttsHeartbeat) clearInterval(ttsHeartbeat);
     ttsHeartbeat = setInterval(() => {
       if (window.speechSynthesis.speaking) {
@@ -224,7 +280,6 @@ export function speakResponse(
     window.speechSynthesis.speak(utt);
   };
 
-  // Voices may not be loaded yet on first call
   if (window.speechSynthesis.getVoices().length === 0) {
     window.speechSynthesis.onvoiceschanged = () => {
       window.speechSynthesis.onvoiceschanged = null;

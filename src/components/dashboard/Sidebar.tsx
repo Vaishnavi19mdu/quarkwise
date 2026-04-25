@@ -3,13 +3,13 @@ import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typogr
 import { LayoutDashboard, Sliders, FileText, Settings, Zap, LogOut } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Logo } from '../ui/Logo';
+
 
 const menuItems = [
   { text: 'Dashboard', icon: <LayoutDashboard size={20} />, sectionId: null,        route: '/dashboard' },
   { text: 'Simulator', icon: <Sliders size={20} />,         sectionId: 'simulator', route: null },
   { text: 'Insights',  icon: <Zap size={20} />,             sectionId: 'insights',  route: null },
-  { text: 'Reports',   icon: <FileText size={20} />,         sectionId: 'reports',   route: null },
+  { text: 'Reports', icon: <FileText size={20} />, sectionId: null, route: '/reports' },
   { text: 'Settings',  icon: <Settings size={20} />,         sectionId: null,        route: '/settings' },
 ];
 
@@ -77,9 +77,7 @@ export const Sidebar = () => {
   return (
     <Box className="w-[240px] h-screen fixed left-0 top-0 bg-white border-r border-slate-100 flex-col z-50 hidden md:flex">
       {/* Logo */}
-      <Box className="h-16 flex items-center px-8 border-b border-slate-50">
-        <Logo className="scale-90 origin-left" />
-      </Box>
+      
 
       {/* Nav */}
       <Box className="flex-1 px-4 py-6">
@@ -129,12 +127,7 @@ export const Sidebar = () => {
         <Paper className="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-4">
           <Typography variant="caption" className="text-slate-400 font-bold block mb-1 uppercase tracking-tighter">Plan</Typography>
           <Typography variant="body2" className="font-bold text-slate-800">Quarkwise Free</Typography>
-          <Box className="mt-3">
-            <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-              <div className="h-full bg-secondary w-3/4 rounded-full" />
-            </div>
-            <Typography variant="caption" className="text-slate-400 mt-1 block">75% of scans used</Typography>
-          </Box>
+          
         </Paper>
 
         <ListItem disablePadding>
